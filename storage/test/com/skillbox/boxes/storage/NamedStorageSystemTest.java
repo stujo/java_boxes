@@ -13,105 +13,128 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.skillbox.boxes.storage.NamedStorageSystem;
-
 abstract public class NamedStorageSystemTest {
 
-	private NamedStorageSystem mStorage;
+  private NamedStorageSystem mStorage;
 
-	@After
-	public void cleanUp() throws IOException {
-		getStorage().discardAll();
-	}
+  @After
+  public void cleanUp() throws IOException {
+    getStorage().discardAll();
+  }
 
-	abstract public NamedStorageSystem createEmptyStorage() throws IOException;
+  abstract public NamedStorageSystem createEmptyStorage() throws IOException;
 
-	protected NamedStorageSystem getStorage() {
-		return mStorage;
-	}
+  protected NamedStorageSystem getStorage() {
+    return mStorage;
+  }
 
-	private void setStorage(NamedStorageSystem storage) {
-		mStorage = storage;
-	}
+  private void setStorage(NamedStorageSystem storage) {
+    mStorage = storage;
+  }
 
-	@Before
-	public void setUp() throws IOException {
-		setStorage(createEmptyStorage());
-		getStorage().store("theAnswer", new Integer(42));
-	}
+  @Before
+  public void setUp() throws IOException {
+    setStorage(createEmptyStorage());
+    getStorage().store("theAnswer", new Integer(42));
+  }
 
-	@Test
-	public void testDiscardAllRemovesEntry() {
-		getStorage().discardAll();
-		Assert.assertFalse("theAnswer should not exist",
-				getStorage().exists("theAnswer"));
-	}
+  @Test
+  public void testDiscardAllRemovesEntry() {
+    getStorage().discardAll();
+    Assert.assertFalse("theAnswer should not exist",
+        getStorage().exists("theAnswer"));
+  }
 
-	@Test
-	public void testExists() {
-		Assert.assertTrue("theAnswer should exist",
-				getStorage().exists("theAnswer"));
-	}
+  @Test
+  public void testRetrieve() throws IOException, ClassNotFoundException {
+    Assert.assertEquals("theAnswer should be 42",
+        getStorage().retrieve("theAnswer"), new Integer(42));
+  }
 
-	@Test
-	public void testNotExists() {
-		Assert.assertFalse("theQuestion should not exist",
-				getStorage().exists("theQuestion"));
-	}
+  @Test
+  public void testExists() {
+    Assert.assertTrue("theAnswer should exist", getStorage()
+        .exists("theAnswer"));
+  }
 
-	@Test
-	public void testStore() throws IOException, ClassNotFoundException {
+  @Test
+  public void testNotExists() {
+    Assert.assertFalse("theQuestion should not exist",
+        getStorage().exists("theQuestion"));
+  }
 
-		Double[] myArray = { 3.142, 1.234, 15.00000001 };
+  @Test
+  public void testStore() throws IOException, ClassNotFoundException {
 
-		getStorage().store("myArray", myArray);
+    Double[] myArray = {
+        3.142, 1.234, 15.00000001
+    };
 
-		Object retrievedArray = getStorage().retrieve("myArray");
+    getStorage().store("myArray", myArray);
 
-		assertThat(retrievedArray, instanceOf(Double[].class));
+    Object retrievedArray = getStorage().retrieve("myArray");
 
-		if (retrievedArray instanceof Double[]) {
-			assertTrue("Stored array is deeply equal",
-					java.util.Arrays.deepEquals(myArray,
-							(Double[]) retrievedArray));
-		}
+    assertThat(retrievedArray, instanceOf(Double[].class));
 
-	}
+    assertTrue("Stored array is deeply equal",
+        java.util.Arrays.deepEquals(myArray, (Double[]) retrievedArray));
 
-	@Test
-	public void testDiscard() throws IOException {
+  }
 
-		getStorage().store("myKnockout", "Sting like a bee");
+  @Test(expected = IllegalArgumentException.class)
+  public void testEmptyStringKey() throws IOException, ClassNotFoundException {
+    getStorage().store("", "empty string value");
+  }
 
-		getStorage().discard("myKnockout");
+  @Test(expected = IllegalArgumentException.class)
+  public void testNullValue() throws IOException, ClassNotFoundException {
+    getStorage().store("null_value", null);
+  }
 
-		Assert.assertFalse("myKnockout should not exist",
-				getStorage().exists("myKnockout"));
-	}
+  @Test
+  public void testEmptyStringValue() throws IOException, ClassNotFoundException {
+    getStorage().store("empty_string", "");
+    Assert.assertEquals("theAnswer should be 42",
+        getStorage().retrieve("empty_string"), "");
+  }
 
-	@Test
-	public void testStoredDataIsCloned() throws IOException,
-			ClassNotFoundException {
+  @Test(expected = IllegalArgumentException.class)
+  public void testEmptyStringKeyWithNullValue() throws IOException,
+      ClassNotFoundException {
+    getStorage().store("", null);
+  }
 
-		HashSet<String> theData = new HashSet<String>();
+  @Test
+  public void testDiscard() throws IOException {
 
-		theData.add("Hello");
+    getStorage().store("myKnockout", "Sting like a bee");
 
-		getStorage().store("theData", theData);
+    getStorage().discard("myKnockout");
 
-		theData.add("Goodbye");
+    Assert.assertFalse("myKnockout should not exist",
+        getStorage().exists("myKnockout"));
+  }
 
-		Object retrievedRaw = getStorage().retrieve("theData");
+  @Test
+  public void testStoredDataIsCloned() throws IOException,
+      ClassNotFoundException {
 
-		// Because of type erasure it's just a HashSet at runtime
-		assertThat(retrievedRaw, instanceOf(HashSet.class));
+    HashSet<String> theData = new HashSet<String>();
 
-		if (retrievedRaw instanceof HashSet) {
-			HashSet<?> retrieved = (HashSet<?>) retrievedRaw;
-			assertFalse(
-					"Should not contain Goodbye since we add that after storage",
-					retrieved.contains("Goodbye"));
-		}
-	}
+    theData.add("Hello");
+
+    getStorage().store("theData", theData);
+
+    theData.add("Goodbye");
+
+    Object retrievedRaw = getStorage().retrieve("theData");
+
+    // Because of type erasure it's just a HashSet at runtime
+    assertThat(retrievedRaw, instanceOf(HashSet.class));
+
+    HashSet<?> retrieved = (HashSet<?>) retrievedRaw;
+    assertFalse("Should not contain Goodbye since we add that after storage",
+        retrieved.contains("Goodbye"));
+  }
 
 }
