@@ -13,14 +13,12 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
+ * An implementation of StorageSystem Stores serialized objects in separate
+ * files underneath a named folder on the file system The named folder is
+ * located in the specified RootFolder
  * 
- * TODO:
- * http://docs.oracle.com/javase/6/docs/api/java/nio/channels/FileChannel.html
- * 
- * @author stuart
- *
+ * @see StorageSystem
  */
-
 public class FileBasedStorageSystem extends NamedStorageSystem {
 
 	private File mRootFolder;
@@ -137,7 +135,7 @@ public class FileBasedStorageSystem extends NamedStorageSystem {
 	}
 
 	@Override
-	public void discard() {
+	public void discardAll() {
 		File[] files = mStorageFolder.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -148,5 +146,10 @@ public class FileBasedStorageSystem extends NamedStorageSystem {
 		for (File fbssFile : files) {
 			fbssFile.delete();
 		}
+	}
+
+	@Override
+	public void discard(String key) {
+		getFileForKey(key).delete();
 	}
 }

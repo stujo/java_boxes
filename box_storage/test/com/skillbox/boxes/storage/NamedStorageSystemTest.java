@@ -21,8 +21,7 @@ abstract public class NamedStorageSystemTest {
 
 	@After
 	public void cleanUp() throws IOException {
-		// In case we allocated a file or a connection
-		getStorage().discard();
+		getStorage().discardAll();
 	}
 
 	abstract public NamedStorageSystem createEmptyStorage() throws IOException;
@@ -42,8 +41,8 @@ abstract public class NamedStorageSystemTest {
 	}
 
 	@Test
-	public void testDiscardRemovesEntry() {
-		getStorage().discard();
+	public void testDiscardAllRemovesEntry() {
+		getStorage().discardAll();
 		Assert.assertFalse("theAnswer should not exist",
 				getStorage().exists("theAnswer"));
 	}
@@ -77,6 +76,17 @@ abstract public class NamedStorageSystemTest {
 							(Double[]) retrievedArray));
 		}
 
+	}
+
+	@Test
+	public void testDiscard() throws IOException {
+
+		getStorage().store("myKnockout", "Sting like a bee");
+
+		getStorage().discard("myKnockout");
+
+		Assert.assertFalse("myKnockout should not exist",
+				getStorage().exists("myKnockout"));
 	}
 
 	@Test

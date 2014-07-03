@@ -21,7 +21,7 @@ public class InMemoryStorageSystem extends NamedStorageSystem {
 	}
 
 	@Override
-	public void discard() {
+	public void discardAll() {
 		mStorage.clear();
 	}
 
@@ -70,5 +70,10 @@ public class InMemoryStorageSystem extends NamedStorageSystem {
 	public Object retrieve(String key) throws IOException,
 			ClassNotFoundException {
 		return convertByteArrayToObject(mStorage.get(key));
+	}
+
+	@Override
+	public void discard(String key) {
+		mStorage.remove(key);
 	}
 }
