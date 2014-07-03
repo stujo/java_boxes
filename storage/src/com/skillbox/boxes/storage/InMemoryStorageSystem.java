@@ -10,19 +10,19 @@ import java.util.HashMap;
 public class InMemoryStorageSystem extends NamedStorageSystem {
   public InMemoryStorageSystem(String name) {
     super(name);
-    mStorage = new HashMap<String, byte[]>();
+    this.mStorage = new HashMap<String, byte[]>();
   }
 
   HashMap<String, byte[]> mStorage;
 
   @Override
   public boolean exists(String key) {
-    return mStorage.containsKey(key);
+    return this.mStorage.containsKey(key);
   }
 
   @Override
   public void discardAll() {
-    mStorage.clear();
+    this.mStorage.clear();
   }
 
   protected byte[] convertObjectToByteArray(Object value) throws IOException {
@@ -36,7 +36,7 @@ public class InMemoryStorageSystem extends NamedStorageSystem {
   }
 
   protected Object convertByteArrayToObject(byte[] bytes) throws IOException,
-      ClassNotFoundException {
+  ClassNotFoundException {
     if (bytes != null) {
       ByteArrayInputStream source = null;
 
@@ -63,16 +63,16 @@ public class InMemoryStorageSystem extends NamedStorageSystem {
 
   @Override
   public void storeImpl(String validKey, Object validValue) throws IOException {
-    mStorage.put(validKey, convertObjectToByteArray(validValue));
+    this.mStorage.put(validKey, convertObjectToByteArray(validValue));
   }
 
   @Override
   public Object retrieve(String key) throws IOException, ClassNotFoundException {
-    return convertByteArrayToObject(mStorage.get(key));
+    return convertByteArrayToObject(this.mStorage.get(key));
   }
 
   @Override
   public void discard(String key) {
-    mStorage.remove(key);
+    this.mStorage.remove(key);
   }
 }

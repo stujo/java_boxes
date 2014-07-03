@@ -9,9 +9,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.skillbox.boxes.storage.FileBasedStorageSystem;
-import com.skillbox.boxes.storage.NamedStorageSystem;
-
 public class FileBasedStorageSystemTest extends NamedStorageSystemTest {
 
   private static File sTemporaryRootFolder;

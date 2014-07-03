@@ -25,11 +25,11 @@ abstract public class NamedStorageSystemTest {
   abstract public NamedStorageSystem createEmptyStorage() throws IOException;
 
   protected NamedStorageSystem getStorage() {
-    return mStorage;
+    return this.mStorage;
   }
 
   private void setStorage(NamedStorageSystem storage) {
-    mStorage = storage;
+    this.mStorage = storage;
   }
 
   @Before
@@ -100,7 +100,7 @@ abstract public class NamedStorageSystemTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testEmptyStringKeyWithNullValue() throws IOException,
-      ClassNotFoundException {
+  ClassNotFoundException {
     getStorage().store("", null);
   }
 
@@ -117,7 +117,7 @@ abstract public class NamedStorageSystemTest {
 
   @Test
   public void testStoredDataIsCloned() throws IOException,
-      ClassNotFoundException {
+  ClassNotFoundException {
 
     HashSet<String> theData = new HashSet<String>();
 

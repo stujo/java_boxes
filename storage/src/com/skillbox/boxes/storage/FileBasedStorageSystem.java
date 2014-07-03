@@ -14,9 +14,9 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * An implementation of StorageSystem Stores serialized objects in separate
- * files underneath a named folder on the file system The named folder is
+ * files underneath a named folder on the file system. The named folder is
  * located in the specified RootFolder
- * 
+ *
  * @see StorageSystem
  */
 public class FileBasedStorageSystem extends NamedStorageSystem {
@@ -30,25 +30,25 @@ public class FileBasedStorageSystem extends NamedStorageSystem {
     super(name);
 
     // Check if root folder exists
-    mRootFolder = new File(rootFolder);
+    this.mRootFolder = new File(rootFolder);
 
-    if (!mRootFolder.exists()) {
+    if (!this.mRootFolder.exists()) {
       throw new FileNotFoundException(rootFolder);
     }
-    if (!mRootFolder.isDirectory()) {
+    if (!this.mRootFolder.isDirectory()) {
       throw new IllegalArgumentException(rootFolder + " is not a directory");
     }
 
-    mStorageFolder = new File(mRootFolder + File.separator
+    this.mStorageFolder = new File(this.mRootFolder + File.separator
         + getSafeStorageDirectoryName());
 
-    if (!mStorageFolder.exists()) {
-      if (!mRootFolder.canWrite()) {
+    if (!this.mStorageFolder.exists()) {
+      if (!this.mRootFolder.canWrite()) {
         throw new IllegalArgumentException(rootFolder + " is not writable");
       }
-      if (!mStorageFolder.mkdir()) {
+      if (!this.mStorageFolder.mkdir()) {
         throw new IllegalArgumentException("Unable to create storage folder "
-            + mStorageFolder);
+            + this.mStorageFolder);
       }
     }
   }
@@ -67,7 +67,7 @@ public class FileBasedStorageSystem extends NamedStorageSystem {
   }
 
   private File getFileForKey(String key) {
-    return new File(mStorageFolder.getAbsolutePath() + File.separator
+    return new File(this.mStorageFolder.getAbsolutePath() + File.separator
         + getFileSystemSafeName(key) + FBSS_EXTENSION);
   }
 
@@ -128,7 +128,7 @@ public class FileBasedStorageSystem extends NamedStorageSystem {
 
   @Override
   public void discardAll() {
-    File[] files = mStorageFolder.listFiles(new FilenameFilter() {
+    File[] files = this.mStorageFolder.listFiles(new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
         return name.endsWith(FBSS_EXTENSION);

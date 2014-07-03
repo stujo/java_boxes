@@ -5,28 +5,26 @@ import java.io.Serializable;
 
 public abstract class NamedStorageSystem implements StorageSystem {
 
+  protected static final int MAX_KEY_STRING_LENGTH = 100;
   private String mName;
 
   public NamedStorageSystem(String name) {
-    mName = name;
+    this.mName = name;
   }
 
   public String getName() {
-    return mName;
+    return this.mName;
   }
 
   @Override
-  public boolean isValidKey(String key) {
-    return key != null && key.length() > 0 && key.length() < getMaxKeyLength();
+  final public boolean isValidKey(String key) {
+    return (key != null) && (key.length() > 0)
+        && (key.length() < MAX_KEY_STRING_LENGTH);
   }
 
   @Override
-  public boolean isValidValue(Object value) {
-    return value != null && value instanceof Serializable;
-  }
-
-  protected int getMaxKeyLength() {
-    return 100;
+  final public boolean isValidValue(Object value) {
+    return (value != null) && (value instanceof Serializable);
   }
 
   @Override

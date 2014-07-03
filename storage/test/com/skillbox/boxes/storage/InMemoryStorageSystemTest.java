@@ -3,9 +3,6 @@ package com.skillbox.boxes.storage;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.skillbox.boxes.storage.InMemoryStorageSystem;
-import com.skillbox.boxes.storage.NamedStorageSystem;
-
 public class InMemoryStorageSystemTest extends NamedStorageSystemTest {
 
   @Override
