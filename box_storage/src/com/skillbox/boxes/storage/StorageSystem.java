@@ -1,4 +1,4 @@
-package com.skillbox.boxes.get_classy;
+package com.skillbox.boxes.storage;
 
 import java.io.IOException;
 

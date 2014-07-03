@@ -1,4 +1,4 @@
-package com.skillbox.boxes.get_classy;
+package com.skillbox.boxes.storage;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertFalse;
@@ -12,6 +12,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.skillbox.boxes.storage.NamedStorageSystem;
 
 abstract public class NamedStorageSystemTest {
 

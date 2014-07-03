@@ -1,4 +1,4 @@
-package com.skillbox.boxes.get_classy;
+package com.skillbox.boxes.storage;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.skillbox.boxes.storage.FileBasedStorageSystem;
+import com.skillbox.boxes.storage.NamedStorageSystem;
 
 public class FileBasedStorageSystemTest extends NamedStorageSystemTest {
 
