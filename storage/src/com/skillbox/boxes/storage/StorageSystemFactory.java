@@ -2,6 +2,13 @@ package com.skillbox.boxes.storage;
 
 import java.io.IOException;
 
+/**
+ * Factory for StorageSystem implementations to hide implementation classes from
+ * clients
+ * 
+ * @author stuart
+ *
+ */
 public class StorageSystemFactory {
 
   private StorageSystemFactory() throws InstantiationException {
