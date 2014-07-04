@@ -15,18 +15,9 @@ public class FileBasedStorageSystemTest extends NamedStorageSystemTest {
 
   @BeforeClass
   static public void ensureTemporaryRootFolder() throws IOException {
-    sTemporaryRootFolder = File.createTempFile("FileBasedStorageSystemTest",
-        Long.toString(System.nanoTime()));
-    // Delete the temporary file
-    if (!(sTemporaryRootFolder.delete())) {
-      throw new IOException("Could not delete temp file: "
-          + sTemporaryRootFolder.getAbsolutePath());
-    }
-    // Create a temporary directory in it's place
-    if (!(sTemporaryRootFolder.mkdir())) {
-      throw new IOException("Could not create temp directory: "
-          + sTemporaryRootFolder.getAbsolutePath());
-    }
+    sTemporaryRootFolder = new File(
+        TestHelper.createTempDirectory(FileBasedStorageSystemTest.class
+            .getSimpleName()));
   }
 
   @AfterClass
@@ -42,8 +33,7 @@ public class FileBasedStorageSystemTest extends NamedStorageSystemTest {
 
   @Test(expected = FileNotFoundException.class)
   public void testInvalidRootFolder() throws IOException {
-    FileBasedStorageSystem storage = new FileBasedStorageSystem("name",
-        "()@#@!");
+    new FileBasedStorageSystem("name", "()@#@!");
   }
 
   @Test

@@ -19,7 +19,7 @@ import java.io.UnsupportedEncodingException;
  *
  * @see StorageSystem
  */
-public class FileBasedStorageSystem extends NamedStorageSystem {
+class FileBasedStorageSystem extends NamedStorageSystem {
 
   private File mRootFolder;
   private File mStorageFolder;

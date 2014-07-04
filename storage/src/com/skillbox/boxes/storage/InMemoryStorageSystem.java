@@ -14,7 +14,7 @@ import java.util.HashMap;
  * @see StorageSystem
  */
 
-public class InMemoryStorageSystem extends NamedStorageSystem {
+class InMemoryStorageSystem extends NamedStorageSystem {
   public InMemoryStorageSystem(String name) {
     super(name);
     this.mStorage = new HashMap<String, byte[]>();
@@ -43,7 +43,7 @@ public class InMemoryStorageSystem extends NamedStorageSystem {
   }
 
   protected Object convertByteArrayToObject(byte[] bytes) throws IOException,
-      ClassNotFoundException {
+  ClassNotFoundException {
     if (bytes != null) {
       ByteArrayInputStream source = null;
 

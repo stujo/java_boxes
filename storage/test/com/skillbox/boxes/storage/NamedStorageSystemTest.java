@@ -100,7 +100,7 @@ abstract public class NamedStorageSystemTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testEmptyStringKeyWithNullValue() throws IOException,
-  ClassNotFoundException {
+      ClassNotFoundException {
     getStorage().store("", null);
   }
 
@@ -117,7 +117,7 @@ abstract public class NamedStorageSystemTest {
 
   @Test
   public void testStoredDataIsCloned() throws IOException,
-  ClassNotFoundException {
+      ClassNotFoundException {
 
     HashSet<String> theData = new HashSet<String>();
 
