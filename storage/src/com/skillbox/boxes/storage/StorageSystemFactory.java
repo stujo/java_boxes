@@ -6,7 +6,7 @@ import java.io.IOException;
  * Factory for StorageSystem implementations to hide implementation classes from
  * clients
  * 
- * @author stuart
+ * @author stujo
  *
  */
 public class StorageSystemFactory {

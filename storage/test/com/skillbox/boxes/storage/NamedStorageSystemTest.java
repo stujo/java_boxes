@@ -142,5 +142,4 @@ abstract public class NamedStorageSystemTest {
     assertFalse("Should not contain Goodbye since we add that after storage",
         retrieved.contains("Goodbye"));
   }
-
 }
