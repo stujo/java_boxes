@@ -13,6 +13,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Base class for tests, since they should all support the same interface
+ * {@link StorageSystem} we can use the same tests for each implementation
+ * 
+ */
+
 abstract public class NamedStorageSystemTest {
 
   private NamedStorageSystem mStorage;

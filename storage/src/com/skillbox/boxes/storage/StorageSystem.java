@@ -88,4 +88,11 @@ public interface StorageSystem {
    * @return true or false
    */
   abstract boolean isValidValue(Object value);
+
+  /**
+   * Return the name value passed at creation
+   *
+   * @return The name supplied as creation
+   */
+  abstract String getName();
 }

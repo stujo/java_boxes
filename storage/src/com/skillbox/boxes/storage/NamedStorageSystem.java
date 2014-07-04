@@ -3,6 +3,14 @@ package com.skillbox.boxes.storage;
 import java.io.IOException;
 import java.io.Serializable;
 
+/**
+ * Abstract class for StorageSystem implementations to handle common
+ * functionality such as name and key/value validations
+ * 
+ * {@link #storeImpl(String, Object)} should be implemented in place of
+ * {@link #store(String, Object)} because we have validated the input parameters
+ * 
+ */
 abstract class NamedStorageSystem implements StorageSystem {
 
   protected static final int MAX_KEY_STRING_LENGTH = 100;
@@ -12,6 +20,7 @@ abstract class NamedStorageSystem implements StorageSystem {
     this.mName = name;
   }
 
+  @Override
   public String getName() {
     return this.mName;
   }

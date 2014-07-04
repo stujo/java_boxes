@@ -82,6 +82,10 @@ class FileBasedStorageSystem extends NamedStorageSystem {
   @Override
   public void storeImpl(String validKey, Object validValue) throws IOException {
     OutputStream out = getOutputStream(validKey);
+
+    /*
+     * TODO: Java 7 Use try with close-able
+     */
     try {
       ObjectOutputStream oos = new ObjectOutputStream(out);
       try {
@@ -102,9 +106,10 @@ class FileBasedStorageSystem extends NamedStorageSystem {
   public Object retrieve(String key) throws IOException, ClassNotFoundException {
 
     InputStream in = getInputStream(key);
-
+    /*
+     * TODO: Java 7 Use try with close-able
+     */
     try {
-
       ObjectInputStream ois = new ObjectInputStream(in);
       try {
         return ois.readObject();

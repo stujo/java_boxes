@@ -27,12 +27,10 @@ public class StorageSystemFactory {
    *          The name you want to use to identify this instance
    * 
    * @return a file based storage
+   * @throws IOException
    */
-  public static StorageSystem fileBasedStorage(String name, String rootPath) {
-    try {
-      return new FileBasedStorageSystem(name, rootPath);
-    } catch (IOException e) {
-      return null;
-    }
+  public static StorageSystem fileBasedStorage(String name, String rootPath)
+      throws IOException {
+    return new FileBasedStorageSystem(name, rootPath);
   }
 }
