@@ -3,7 +3,7 @@ package com.skillbox.boxes.storage;
 import java.io.IOException;
 import java.io.Serializable;
 
-public abstract class NamedStorageSystem implements StorageSystem {
+abstract class NamedStorageSystem implements StorageSystem {
 
   protected static final int MAX_KEY_STRING_LENGTH = 100;
   private String mName;

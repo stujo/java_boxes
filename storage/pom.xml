@@ -37,6 +37,12 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration></configuration>
+			</plugin>
 		</plugins>
 	</reporting>
 	<dependencies>
@@ -47,4 +53,10 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<scm>
+		<url>https://github.com/stujo/java_boxes</url>
+	</scm>
+	<name>BoxStorage</name>
+	<description>A java sample application demonstating basic class inheritance and interface implementation</description>
+	<url>https://github.com/stujo/java_boxes</url>
 </project>

@@ -7,6 +7,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
+/**
+ * An implementation of StorageSystem Stores serialized objects in memory in a
+ * key value map
+ *
+ * @see StorageSystem
+ */
+
 public class InMemoryStorageSystem extends NamedStorageSystem {
   public InMemoryStorageSystem(String name) {
     super(name);
@@ -36,7 +43,7 @@ public class InMemoryStorageSystem extends NamedStorageSystem {
   }
 
   protected Object convertByteArrayToObject(byte[] bytes) throws IOException,
-  ClassNotFoundException {
+      ClassNotFoundException {
     if (bytes != null) {
       ByteArrayInputStream source = null;
 
