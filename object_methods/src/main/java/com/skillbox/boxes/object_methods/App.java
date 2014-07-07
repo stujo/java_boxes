@@ -40,7 +40,7 @@ class BinaryToTextSystemOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(int ch) throws IOException {
+  public void write(final int ch) throws IOException {
     if (ch >= 32 && ch < 127) {
       System.out.format("  %s", (char) ch);
     } else {
@@ -52,7 +52,7 @@ class BinaryToTextSystemOutputStream extends OutputStream {
     }
   }
 
-  static public void dumpFile(File file) throws IOException {
+  static public void dumpFile(final File file) throws IOException {
 
     BinaryToTextSystemOutputStream out = null;
 
@@ -83,13 +83,14 @@ class BinaryToTextSystemOutputStream extends OutputStream {
 public class App {
   private static final String APP_VERSION_STRING = "Circlesv1.0";
 
-  public static CommandLine getCommandLine(String[] args, Options options) {
+  public static CommandLine getCommandLine(final String[] args,
+      final Options options) {
     // create the parser
-    CommandLineParser parser = new BasicParser();
+    final CommandLineParser parser = new BasicParser();
     try {
       // parse the command line arguments
       return parser.parse(options, args);
-    } catch (ParseException exp) {
+    } catch (final ParseException exp) {
       // oops, something went wrong
       System.err.println("Parsing failed.  Reason: " + exp.getMessage());
     }
@@ -99,22 +100,22 @@ public class App {
 
   @SuppressWarnings("static-access")
   private static Options buildCommandLineOptions() {
-    Options options = new Options();
+    final Options options = new Options();
 
-    Option outputfile = OptionBuilder.withArgName("output").hasArg()
+    final Option outputfile = OptionBuilder.withArgName("output").hasArg()
         .withType(File.class).withDescription("save to file").create("file");
     options.addOption(outputfile);
 
-    Option circleCount = OptionBuilder.withArgName("count").hasArg()
+    final Option circleCount = OptionBuilder.withArgName("count").hasArg()
         .withType(Number.class).withDescription("number of circles")
         .create("count");
     options.addOption(circleCount);
     return options;
   }
 
-  public static void main(String[] args) {
-    Options options = buildCommandLineOptions();
-    CommandLine commandLine = getCommandLine(args, options);
+  public static void main(final String[] args) {
+    final Options options = buildCommandLineOptions();
+    final CommandLine commandLine = getCommandLine(args, options);
     try {
       int iCircleCount = 5;
 
@@ -124,40 +125,70 @@ public class App {
 
       if (iCircleCount > 0) {
         try {
-          File outputFile = File.createTempFile("circles", ".ser", null);
+          final File outputFile = File.createTempFile("circles", ".ser", null);
 
           System.out.printf("Filename:" + outputFile.getAbsolutePath());
 
-          writeRandomCircles(iCircleCount, outputFile);
+          final Circle[] originalCircles = writeRandomCircles(iCircleCount,
+              outputFile);
 
           dumpBinaryFile(outputFile);
 
-          ArrayList<Circle> circles = readCircles(outputFile);
+          final ArrayList<Circle> loadedCircles = loadCirclesFromFile(outputFile);
 
-          System.out.println(String.format("%d Circles Read From: %s",
-              circles.size(), outputFile.getAbsolutePath()));
-          for (Circle c : circles) {
-            System.out.println(c.toString());
-          }
+          assertCirclesArraysAreEqual(originalCircles, loadedCircles);
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
           System.err.println("IOException: " + e.getMessage());
           e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
           System.err.println("ClassNotFoundException: " + e.getMessage());
           e.printStackTrace();
         }
       }
-    } catch (NumberFormatException nfe) {
+    } catch (final NumberFormatException nfe) {
       // automatically generate the help statement
-      HelpFormatter formatter = new HelpFormatter();
+      final HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("circles", options);
     }
   }
 
-  private static ArrayList<Circle> readCircles(File file) throws IOException,
-      ClassNotFoundException {
-    ArrayList<Circle> circles = new ArrayList<Circle>();
+  private static void assertCirclesArraysAreEqual(
+      final Circle[] originalCircles, final ArrayList<Circle> loadedCircles) {
+
+    for (int i = 0; i < originalCircles.length; i++) {
+      final Circle orgCircle = originalCircles[i];
+      final Circle loadedCircle = loadedCircles.get(i);
+
+      if (orgCircle == loadedCircle) {
+        System.err.println(String.format("Should not ==:" + orgCircle
+            + "\nand\n" + loadedCircle));
+      }
+      if (!orgCircle.equals(loadedCircle)) {
+        System.err.println(String.format("Should be equal:" + orgCircle
+            + "\nand\n" + loadedCircle));
+      }
+    }
+
+  }
+
+  private static ArrayList<Circle> loadCirclesFromFile(final File outputFile)
+      throws IOException, ClassNotFoundException {
+    final ArrayList<Circle> circles = readCircles(outputFile);
+
+    System.out.println(String.format("%d Circles Read From: %s",
+        circles.size(), outputFile.getAbsolutePath()));
+
+    for (final Circle c : circles) {
+      System.out.println(c.toString());
+    }
+
+    return circles;
+  }
+
+  private static ArrayList<Circle> readCircles(final File file)
+      throws IOException, ClassNotFoundException {
+    final ArrayList<Circle> circles = new ArrayList<Circle>();
 
     FileInputStream fis = null;
 
@@ -168,15 +199,15 @@ public class App {
       try {
         ois = new ObjectInputStream(fis);
 
-        Object oVersion = ois.readObject();
+        final Object oVersion = ois.readObject();
         assert (APP_VERSION_STRING == oVersion);
-        Object oCount = ois.readObject();
+        final Object oCount = ois.readObject();
         assert (oCount instanceof Integer);
 
-        Integer count = (Integer) oCount;
+        final Integer count = (Integer) oCount;
 
         for (int i = 0; i < count; i++) {
-          Object object = ois.readObject();
+          final Object object = ois.readObject();
           if (object instanceof Circle) {
             circles.add((Circle) object);
           }
@@ -196,31 +227,35 @@ public class App {
     return circles;
   }
 
-  private static void dumpBinaryFile(File file) throws IOException {
+  private static void dumpBinaryFile(final File file) throws IOException {
     BinaryToTextSystemOutputStream.dumpFile(file);
   }
 
-  private static void writeRandomCircles(int iCircleCount, File outputFile)
-      throws FileNotFoundException, IOException {
-    FileOutputStream fos = new FileOutputStream(outputFile);
+  private static Circle[] writeRandomCircles(final int iCircleCount,
+      final File outputFile) throws FileNotFoundException, IOException {
+
+    final Circle[] results = new Circle[iCircleCount];
+    final FileOutputStream fos = new FileOutputStream(outputFile);
 
     try {
-      ObjectOutputStream oos = new ObjectOutputStream(fos);
+      final ObjectOutputStream oos = new ObjectOutputStream(fos);
       try {
         oos.writeObject(APP_VERSION_STRING);
         oos.writeObject(iCircleCount);
 
         for (int i = 0; i < iCircleCount; i++) {
 
-          int x = randomInt(-10, 10);
-          int y = randomInt(-10, 10);
-          int radius = randomInt(-10, 10);
+          final int x = randomInt(-10, 10);
+          final int y = randomInt(-10, 10);
+          final int radius = randomInt(-10, 10);
 
-          Circle circle = new Circle(x, y, radius);
-          circle.setName(String.format("Shape#%d", i + 1));
+          final Circle circle = new Circle(x, y, radius, String.format(
+              "Shape#%d", i + 1));
           circle.setMemo(String.format("I'm %s", circle.getName()));
           System.out.println("Writing :" + circle.toString());
           oos.writeObject(circle);
+
+          results[i] = circle;
         }
       } finally {
         if (null != oos) {
@@ -232,19 +267,20 @@ public class App {
         fos.close();
       }
     }
+    return results;
   }
 
   private static Random sGenerator = new Random(System.currentTimeMillis());
 
-  static int randomInt(int low, int high) {
+  static int randomInt(final int low, final int high) {
 
     if (low == high) {
       return low;
     }
 
-    int range = (high - low) + 1;
+    final int range = (high - low) + 1;
 
-    int rand = sGenerator.nextInt(range) + low;
+    final int rand = sGenerator.nextInt(range) + low;
 
     return rand;
   }
