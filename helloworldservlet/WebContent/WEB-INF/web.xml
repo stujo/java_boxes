@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>helloworldservlet</display-name>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<context-param>
+		<param-name>pref_greet</param-name>
+		<param-value>Good Day!</param-value>
+	</context-param>
+
+	<servlet>
+		<description></description>
+		<display-name>HelloWorldServlet</display-name>
+		<servlet-name>HelloWorldServlet</servlet-name>
+		<servlet-class>com.skillbox.boxes.helloworld.servlet.HelloWorldServlet</servlet-class>
+		<init-param>
+			<description>Name of Greeter</description>
+			<param-name>greeter_name</param-name>
+			<param-value>Billy</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>HelloWorldServlet</servlet-name>
+		<url-pattern>/HelloWorldServlet</url-pattern>
+	</servlet-mapping>
+</web-app>
