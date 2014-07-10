@@ -25,11 +25,17 @@ public class Demo implements Enumeration<String> {
     mNextIndex = 0;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean hasMoreElements() {
     return mStrings != null && mNextIndex < mStrings.length;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String nextElement() {
     return mStrings[mNextIndex++];
