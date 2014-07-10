@@ -27,7 +27,7 @@ public class LockerApp {
   }
 
   public static void main(final String[] args) {
-    System.out.println("Starting Locker");
+    System.out.println("Starting LockerApp (Main Thread)");
 
     final Friend alphonse = new Friend("Alphonse");
 
@@ -46,7 +46,7 @@ public class LockerApp {
       }
     }).start();
 
-    System.out.println("Ending Locker");
+    System.out.println("Ending LockerApp (Main Thread)");
   }
 
 }
