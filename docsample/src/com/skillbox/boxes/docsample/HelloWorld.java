@@ -1,21 +1,33 @@
 package com.skillbox.boxes.docsample;
 
-import com.skillbox.boxes.docsample.sub.Demo;
+import com.skillbox.boxes.docsample.sub.SecretStringEnumerator;
 
 /**
- * Simple application which prints Hello World to System.out
+ * Simple application which prints Hello World to System.out.
+ *
  * <p>
- * This is an example for JavaDoc
+ * This is an example for javadoc generation
+ * </p>
  *
+ * <pre>
  * http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html
+ * </pre>
  *
+ * <p>
  * Generate full documents with:
+ * </p>
  *
+ * <pre>
  * javadoc -d ./doc -sourcepath ./src -subpackages com.skillbox.boxes.docsample
- * 
- * or
- * 
- * use the ant task added to build.xml
+ * </pre>
+ *
+ * <p>
+ * or use the ant task added to build.xml
+ * </p>
+ *
+ * <pre>
+ * ant doc
+ * </pre>
  *
  * @author Stuart
  */
@@ -34,7 +46,7 @@ public class HelloWorld {
     final String[] messages = {
         "Hello", "World"
     };
-    final Demo demo = new Demo(messages);
+    final SecretStringEnumerator demo = new SecretStringEnumerator(messages);
     boolean first = true;
     while (demo.hasMoreElements()) {
       if (!first) {
