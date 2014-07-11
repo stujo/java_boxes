@@ -1,0 +1,5 @@
+<dataset>
+	<INVENTORY ID="1"  NAME="Flat Screen TV" STOCK_LEVEL="42" />
+	<INVENTORY ID="2"  NAME="Red Sofa" STOCK_LEVEL="0" />
+	<INVENTORY ID="4" NAME="Pink Lamp" STOCK_LEVEL="12" />
+</dataset>
