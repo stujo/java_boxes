@@ -16,22 +16,89 @@ import org.json.JSONObject;
 
 public class WeatherRequest {
 
-  static final String API_PROTOCOL = "http";
   static final String API_HOST = "api.openweathermap.org";
   static final String API_PATH = "/data/2.5/weather";
+  static final String API_PROTOCOL = "http";
 
-  // The output
-  JSONObject mResponseJSON;
+  private final Logger mLogger;
 
   // The input
   private final String mQuery;
-  private final Logger mLogger;
-  private String mResponseMessage;
   private int mResponseCode;
+  // The output
+  JSONObject mResponseJSON;
+  private String mResponseMessage;
 
   public WeatherRequest(final String query, final Logger logger) {
     mQuery = query;
     mLogger = logger;
+  }
+
+  HttpURLConnection getConnection() throws IOException {
+
+    HttpURLConnection conn = null;
+    URI uri = null;
+    try {
+      uri = new URI(API_PROTOCOL, API_HOST, API_PATH, "q=" + getQuery(), null);
+      final URL url = uri.toURL();
+      conn = (HttpURLConnection) url.openConnection();
+    } catch (final URISyntaxException e) {
+      logError("Unable to create URI for '" + getQuery() + "'", e);
+    } catch (final MalformedURLException e) {
+      logError("Unable to create valid URL for '" + getQuery() + "'", e);
+    }
+
+    return conn;
+  }
+
+  private String getJSONStringFromAPI() {
+    try {
+      final HttpURLConnection connection = getConnection();
+      if (connection != null) {
+        mLogger.log(Level.FINE, "Querying: '" + connection.getURL().toString()
+            + "'");
+        // Will block to read
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+          InputStreamReader isr = null;
+          try {
+            isr = new InputStreamReader(connection.getInputStream());
+            return readRawText(isr);
+          } finally {
+            if (isr != null) {
+              try {
+                isr.close();
+              } catch (final IOException e) {
+              }
+            }
+          }
+        }
+      } else {
+        logError("Unable to open connection to API");
+      }
+    } catch (final IOException ioe) {
+      logError("Exception processing '" + getQuery() + "'", ioe);
+    }
+    return null;
+  }
+
+  public String getQuery() {
+    return mQuery;
+  }
+
+  public String getResponseMessage() {
+    return mResponseMessage;
+  }
+
+  public String getWeatherForcast() {
+
+    String weatherMessage = null;
+
+    if (mResponseJSON.has("weather")) {
+      final JSONArray weatherArray = mResponseJSON.getJSONArray("weather");
+      final JSONObject weather = weatherArray.getJSONObject(0);
+      weatherMessage = weather.getString("main");
+    }
+    return weatherMessage;
   }
 
   public boolean loadData() {
@@ -63,34 +130,12 @@ public class WeatherRequest {
     return mResponseJSON != null;
   }
 
-  private String getJSONStringFromAPI() {
-    try {
-      final HttpURLConnection connection = getConnection();
-      if (connection != null) {
-        mLogger.log(Level.FINE, "Querying: '" + connection.getURL().toString()
-            + "'");
-        // Will block to read
-        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-          InputStreamReader isr = null;
-          try {
-            isr = new InputStreamReader(connection.getInputStream());
-            return readRawText(isr);
-          } finally {
-            if (isr != null) {
-              try {
-                isr.close();
-              } catch (final IOException e) {
-              }
-            }
-          }
-        }
-      } else {
-        logError("Unable to open connection to API");
-      }
-    } catch (final IOException ioe) {
-      logError("Exception processing '" + getQuery() + "'", ioe);
-    }
-    return null;
+  private void logError(final String message) {
+    mLogger.log(Level.SEVERE, message);
+  }
+
+  private void logError(final String message, final Exception e) {
+    mLogger.log(Level.SEVERE, message, e);
   }
 
   private String readRawText(final InputStreamReader isr) throws IOException {
@@ -124,53 +169,8 @@ public class WeatherRequest {
     mResponseMessage = null;
   }
 
-  private void logError(final String message, final Exception e) {
-    mLogger.log(Level.SEVERE, message, e);
-  }
-
-  private void logError(final String message) {
-    mLogger.log(Level.SEVERE, message);
-  }
-
-  private HttpURLConnection getConnection() throws IOException {
-
-    HttpURLConnection conn = null;
-    URI uri = null;
-    try {
-      uri = new URI(API_PROTOCOL, API_HOST, API_PATH, "q=" + getQuery(), null);
-      final URL url = uri.toURL();
-      conn = (HttpURLConnection) url.openConnection();
-    } catch (final URISyntaxException e) {
-      logError("Unable to create URI for '" + getQuery() + "'", e);
-    } catch (final MalformedURLException e) {
-      logError("Unable to create valid URL for '" + getQuery() + "'", e);
-    }
-
-    return conn;
-  }
-
-  public String getWeatherForcast() {
-
-    String weatherMessage = null;
-
-    if (mResponseJSON.has("weather")) {
-      final JSONArray weatherArray = mResponseJSON.getJSONArray("weather");
-      final JSONObject weather = weatherArray.getJSONObject(0);
-      weatherMessage = weather.getString("main");
-    }
-    return weatherMessage;
-  }
-
-  public String getQuery() {
-    return mQuery;
-  }
-
   public boolean successful() {
     return mResponseJSON != null && mResponseCode == 200;
-  }
-
-  public String getResponseMessage() {
-    return mResponseMessage;
   }
 
 }
