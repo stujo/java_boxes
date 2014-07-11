@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class App {
   static void process(final WeatherRequest request, final PrintStream out,
       final Logger logger) {
-    if (request.loadData()) {
+    if (request.loadJSON()) {
       if (request.successful()) {
         out.println(String.format("Main weather forecast for '%s' is '%s'",
             request.getQuery(), request.getWeatherForcast()));
@@ -56,7 +56,7 @@ public class App {
     }
   }
 
-  private static WeatherRequest buildRequestFromArgs(final String[] args,
+  static WeatherRequest buildRequestFromArgs(final String[] args,
       final Logger logger) {
 
     WeatherRequest wr = null;
