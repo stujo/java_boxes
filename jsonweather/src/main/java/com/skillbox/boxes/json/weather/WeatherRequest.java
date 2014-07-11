@@ -21,11 +21,13 @@ public class WeatherRequest {
   static final String API_PATH = "/data/2.5/weather";
 
   // The output
-  JSONObject mJSONResponse;
+  JSONObject mResponseJSON;
 
   // The input
   private final String mQuery;
   private final Logger mLogger;
+  private String mResponseMessage;
+  private int mResponseCode;
 
   public WeatherRequest(final String query, final Logger logger) {
     mQuery = query;
@@ -33,66 +35,93 @@ public class WeatherRequest {
   }
 
   public boolean loadData() {
-    mJSONResponse = null;
+
+    reset();
+
     if (getQuery() != null && getQuery().length() > 1) {
 
-      HttpURLConnection connection;
-      try {
-        connection = getConnection();
-        if (connection != null) {
-          mLogger.log(Level.FINE, "Querying: '"
-              + connection.getURL().toString() + "'");
-          // Will block to read
-          if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            InputStreamReader isr = null;
+      final String rawJson = getJSONStringFromAPI();
 
-            final StringBuffer rawJson = new StringBuffer();
+      if (null != rawJson) {
 
-            try {
-              isr = new InputStreamReader(connection.getInputStream());
+        mResponseJSON = new JSONObject(rawJson);
 
-              // @see
-              // http://docs.oracle.com/javase/6/docs/api/java/io/BufferedReader.html
-              BufferedReader bufferedReader = null;
-              try {
-                bufferedReader = new BufferedReader(isr);
+        mLogger.log(Level.FINE, mResponseJSON.toString());
 
-                String line = null;
-                while ((line = bufferedReader.readLine()) != null) {
-                  rawJson.append(line);
-                }
+        mResponseCode = mResponseJSON.getInt("cod");
 
-                mJSONResponse = new JSONObject(rawJson.toString());
-
-                mLogger.log(Level.FINE, mJSONResponse.toString());
-
-              } finally {
-                if (bufferedReader != null) {
-                  try {
-                    bufferedReader.close();
-                  } catch (final IOException e) {
-                  }
-                }
-              }
-            } finally {
-              if (isr != null) {
-                try {
-                  isr.close();
-                } catch (final IOException e) {
-                }
-              }
-            }
-
-          }
+        if (mResponseJSON.has("message")) {
+          mResponseMessage = mResponseJSON.getString("message");
         }
-      } catch (final IOException ioe) {
-        logError("Exception processing '" + getQuery() + "'", ioe);
+      } else {
+        mResponseMessage = "Unable to get weather for '" + getQuery() + "'";
       }
     } else {
-      logError("Invalid query '" + getQuery() + "'");
+      mResponseMessage = "Invalid query '" + getQuery() + "'";
     }
 
-    return mJSONResponse != null;
+    return mResponseJSON != null;
+  }
+
+  private String getJSONStringFromAPI() {
+    try {
+      final HttpURLConnection connection = getConnection();
+      if (connection != null) {
+        mLogger.log(Level.FINE, "Querying: '" + connection.getURL().toString()
+            + "'");
+        // Will block to read
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+          InputStreamReader isr = null;
+          try {
+            isr = new InputStreamReader(connection.getInputStream());
+            return readRawText(isr);
+          } finally {
+            if (isr != null) {
+              try {
+                isr.close();
+              } catch (final IOException e) {
+              }
+            }
+          }
+        }
+      } else {
+        logError("Unable to open connection to API");
+      }
+    } catch (final IOException ioe) {
+      logError("Exception processing '" + getQuery() + "'", ioe);
+    }
+    return null;
+  }
+
+  private String readRawText(final InputStreamReader isr) throws IOException {
+    BufferedReader bufferedReader = null;
+    try {
+      final StringBuffer rawText = new StringBuffer();
+      bufferedReader = new BufferedReader(isr);
+
+      String line = null;
+      while ((line = bufferedReader.readLine()) != null) {
+        rawText.append(line);
+      }
+
+      if (rawText.length() > 0) {
+        return rawText.toString();
+      }
+    } finally {
+      if (bufferedReader != null) {
+        try {
+          bufferedReader.close();
+        } catch (final IOException e) {
+        }
+      }
+    }
+    return null;
+  }
+
+  private void reset() {
+    mResponseJSON = null;
+    mResponseCode = 0;
+    mResponseMessage = null;
   }
 
   private void logError(final String message, final Exception e) {
@@ -121,12 +150,27 @@ public class WeatherRequest {
   }
 
   public String getWeatherForcast() {
-    final JSONArray weatherArray = mJSONResponse.getJSONArray("weather");
-    final JSONObject weather = weatherArray.getJSONObject(0);
-    return weather.getString("main");
+
+    String weatherMessage = null;
+
+    if (mResponseJSON.has("weather")) {
+      final JSONArray weatherArray = mResponseJSON.getJSONArray("weather");
+      final JSONObject weather = weatherArray.getJSONObject(0);
+      weatherMessage = weather.getString("main");
+    }
+    return weatherMessage;
   }
 
   public String getQuery() {
     return mQuery;
   }
+
+  public boolean successful() {
+    return mResponseJSON != null && mResponseCode == 200;
+  }
+
+  public String getResponseMessage() {
+    return mResponseMessage;
+  }
+
 }

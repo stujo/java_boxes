@@ -14,8 +14,16 @@ public class App {
   static void process(final WeatherRequest request, final PrintStream out,
       final Logger logger) {
     if (request.loadData()) {
-      out.println(String.format("Main weather forecast for '%s' is '%s'",
-          request.getQuery(), request.getWeatherForcast()));
+      if (request.successful()) {
+        out.println(String.format("Main weather forecast for '%s' is '%s'",
+            request.getQuery(), request.getWeatherForcast()));
+      } else {
+        out.format("An error occur looking up '%s' : %s%n", request.getQuery(),
+            request.getResponseMessage());
+      }
+    } else {
+      out.format("Unable to search for  '%s' : %s%n", request.getQuery(),
+          request.getResponseMessage());
     }
   }
 
