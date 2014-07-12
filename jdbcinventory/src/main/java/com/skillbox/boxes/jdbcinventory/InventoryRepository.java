@@ -21,20 +21,19 @@ public class InventoryRepository {
     mConnection = mDataSource.getConnection();
   }
 
-  public Inventory findInventoryByProductName(final String name)
+  public Inventory findInventoryByProductName(final String productName)
       throws SQLException {
 
-    final PreparedStatement preStatement = mConnection
-        .prepareStatement("SELECT " + FIELDS_SQL + " FROM " + TABLE_SQL
-            + " WHERE NAME = ?");
-    preStatement.setString(1, name);
+    final PreparedStatement prepStmt = mConnection.prepareStatement("SELECT "
+        + FIELDS_SQL + " FROM " + TABLE_SQL + " WHERE NAME = ?");
+    prepStmt.setString(1, productName);
 
-    return lookupSingleItem(preStatement);
+    return lookupSingleItem(prepStmt);
   }
 
-  Inventory lookupSingleItem(final PreparedStatement preStatement)
+  Inventory lookupSingleItem(final PreparedStatement prepStmt)
       throws SQLException {
-    final ResultSet result = preStatement.executeQuery();
+    final ResultSet result = prepStmt.executeQuery();
 
     Inventory item = null;
 
@@ -45,16 +44,30 @@ public class InventoryRepository {
     return item;
   }
 
-  public Inventory findInventoryById(final int id) throws SQLException {
-    final PreparedStatement preStatement = mConnection
-        .prepareStatement("SELECT " + FIELDS_SQL + " FROM " + TABLE_SQL
-            + " WHERE ID = ?");
+  /**
+   * Return the current stock_level for a product
+   *
+   * @param productId
+   *
+   * @return Current Stock Level
+   * @throws SQLException
+   */
+  public Inventory findInventoryById(final int productId) throws SQLException {
+    final PreparedStatement prepStmt = mConnection.prepareStatement("SELECT "
+        + FIELDS_SQL + " FROM " + TABLE_SQL + " WHERE ID = ?");
 
-    preStatement.setInt(1, id);
+    prepStmt.setInt(1, productId);
 
-    return lookupSingleItem(preStatement);
+    return lookupSingleItem(prepStmt);
   }
 
+  /**
+   * Return the count of the number of product inventory records.
+   *
+   * @return The number of rows in the table
+   *
+   * @throws SQLException
+   */
   public int count() throws SQLException {
 
     final Statement stmt = mConnection.createStatement();
@@ -62,25 +75,87 @@ public class InventoryRepository {
     final ResultSet rs = stmt.executeQuery("SELECT " + COUNT_SQL
         + " as CNT FROM " + TABLE_SQL + " WHERE 1");
 
-    return rs.next() ? rs.getInt("CNT") : 0;
+    rs.next();
+
+    return rs.getInt("CNT");
   }
 
-  public int getStockLevelById(final int id) throws SQLException {
-    final Inventory inventory = findInventoryById(id);
+  /**
+   * Return Current Stock level
+   *
+   * @param productId
+   * @return
+   * @throws SQLException
+   */
+  public int getStockLevelById(final int productId) throws SQLException {
+    final Inventory inventory = findInventoryById(productId);
     return inventory != null ? inventory.getStockLevel() : 0;
   }
 
-  public int decrementStockLevelById(final int id, final int soldCount)
-      throws SQLException {
-    final PreparedStatement preStatement = mConnection
-        .prepareStatement("UPDATE " + TABLE_SQL
-            + " SET STOCK_LEVEL = STOCK_LEVEL - ? WHERE ID = ?");
-    preStatement.setInt(1, id);
-    preStatement.setInt(2, id);
+  /**
+   * Decrement Stock Quantity without regard for current stock level
+   *
+   * @param productId
+   * @param soldCount
+   * @return
+   * @throws SQLException
+   */
+  public boolean decrementStockLevelById(final int productId,
+      final int soldCount) throws SQLException {
+    final PreparedStatement prepStmt = mConnection.prepareStatement("UPDATE "
+        + TABLE_SQL + " SET STOCK_LEVEL = STOCK_LEVEL - ? WHERE ID = ?");
+    prepStmt.setInt(1, soldCount);
+    prepStmt.setInt(2, productId);
 
-    final int result = preStatement.executeUpdate();
+    final int rowsUpdated = prepStmt.executeUpdate();
 
+    return (rowsUpdated > 0);
+  }
+
+  /**
+   * Delete All Product Inventory Data
+   *
+   * @return
+   * @throws SQLException
+   */
+  public int deleteAll() throws SQLException {
+    final PreparedStatement prepStmt = mConnection
+        .prepareStatement("DELETE FROM " + TABLE_SQL + " WHERE 1");
+    final int result = prepStmt.executeUpdate();
     return result;
+  }
 
+  /**
+   * Atomic Decrement of STOCK_LEVEL.
+   * <p>
+   * Attempts to decrement the stock level and returns true if enough units were
+   * on hand and the stock level was reduced
+   *
+   * @param productId
+   *          Product ID
+   * @param soldCount
+   *          Quantity Requested
+   * @return true if the units were allocated to you or false
+   * @throws SQLException
+   * @throws InterruptedException
+   */
+  public boolean attemptToBuyItems(final int productId, final int soldCount)
+      throws SQLException, InterruptedException {
+
+    boolean purchased = false;
+
+    final PreparedStatement prepStmt = mConnection
+        .prepareStatement("UPDATE "
+            + TABLE_SQL
+            + " SET STOCK_LEVEL = STOCK_LEVEL - ? WHERE ID = ? AND STOCK_LEVEL >= ?");
+    prepStmt.setInt(1, soldCount);
+    prepStmt.setInt(2, productId);
+    prepStmt.setInt(3, soldCount);
+
+    final int updated = prepStmt.executeUpdate();
+
+    purchased = updated > 0;
+
+    return purchased;
   }
 }
