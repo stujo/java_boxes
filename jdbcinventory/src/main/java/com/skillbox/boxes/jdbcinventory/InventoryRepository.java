@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -15,10 +17,12 @@ public class InventoryRepository {
   private static final String COUNT_SQL = "COUNT(*)";
   private final DataSource mDataSource;
   private final Connection mConnection;
+  private final Logger mLogger;
 
   public InventoryRepository(final DataSource dataSource) throws SQLException {
     mDataSource = dataSource;
     mConnection = mDataSource.getConnection();
+    mLogger = Logger.getLogger(this.getClass().getName());
   }
 
   public Inventory findInventoryByProductName(final String productName)
@@ -157,5 +161,15 @@ public class InventoryRepository {
     purchased = updated > 0;
 
     return purchased;
+  }
+
+  public boolean save(final Inventory lampInventory) {
+    try {
+      lampInventory.save(mConnection, TABLE_SQL);
+      return true;
+    } catch (final SQLException e) {
+      mLogger.log(Level.SEVERE, "Error Saving Inventory", e);
+    }
+    return false;
   }
 }

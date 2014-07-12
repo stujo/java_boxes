@@ -1,5 +1,7 @@
 package com.skillbox.boxes.jdbcinventory;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -13,7 +15,7 @@ public class Inventory {
     final Inventory result = new Inventory();
     result.mId = rs.getInt("ID");
     result.setProductName(rs.getString("NAME"));
-    result.setStockLevel(rs.getInt("STOCK_LEVEL"));
+    result.mStockLevel = rs.getInt("STOCK_LEVEL");
     return result;
   }
 
@@ -33,7 +35,11 @@ public class Inventory {
     return mStockLevel;
   }
 
-  public void setStockLevel(final Integer stockLevel) {
-    mStockLevel = stockLevel;
+  void save(final Connection conn, final String tableName) throws SQLException {
+    final PreparedStatement prepStmt = conn.prepareStatement("UPDATE "
+        + tableName + " SET NAME = ? WHERE ID = ?");
+    prepStmt.setString(1, getProductName());
+    prepStmt.setInt(2, getId());
+    prepStmt.executeUpdate();
   }
 }
