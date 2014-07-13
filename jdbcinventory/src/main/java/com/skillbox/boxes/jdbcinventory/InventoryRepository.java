@@ -244,6 +244,19 @@ public class InventoryRepository {
   /**
    * Attempts to load inventory data from file
    *
+   * This is currently implemented through the Repository
+   *
+   * If we're only load a few items this is ok, but in a real world example we'd
+   * use SQL batches or an ETL tool.
+   *
+   * SQL Batches look like this:
+   *
+   * Connection connection = new getConnection(); Statement statement =
+   * connection.createStatement();
+   *
+   * for (String query : queries) { statement.addBatch(query); }
+   * statement.executeBatch(); statement.close(); connection.close();
+   *
    * @param is
    *          - File Location
    * @return The count of rows imported
