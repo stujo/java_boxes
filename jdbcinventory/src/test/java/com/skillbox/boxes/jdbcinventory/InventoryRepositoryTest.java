@@ -4,6 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -14,6 +19,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class InventoryRepositoryTest {
+  private static final String SQL_H2_INVENTORY_COLUMNS = "ID bigint auto_increment, NAME VARCHAR(255), STOCK_LEVEL INTEGER, PRIMARY KEY ( id )";
+
   @BeforeClass
   public static void createSchema() throws Exception {
     TestHelper.createSchema();
@@ -32,9 +39,9 @@ public class InventoryRepositoryTest {
     final Inventory flatscreenInventory = repository
         .findInventoryByProductName("Flat Screen TV");
     assertNotNull(flatscreenInventory);
-    assertEquals(new Integer(1), flatscreenInventory.getId());
+    assertEquals(new Long(1), flatscreenInventory.getId());
     assertEquals("Flat Screen TV", flatscreenInventory.getProductName());
-    assertEquals(new Integer(42), flatscreenInventory.getStockLevel());
+    assertEquals(42, flatscreenInventory.getStockLevel());
   }
 
   @Test
@@ -44,7 +51,7 @@ public class InventoryRepositoryTest {
     final Inventory lampInventory = repository.findInventoryById(4);
     assertNotNull(lampInventory);
     assertEquals("Pink Lamp", lampInventory.getProductName());
-    assertEquals(new Integer(12), lampInventory.getStockLevel());
+    assertEquals(12, lampInventory.getStockLevel());
   }
 
   @Test
@@ -122,8 +129,6 @@ public class InventoryRepositoryTest {
 
       } catch (final SQLException e) {
         mLogger.log(Level.SEVERE, "Error in " + mName, e);
-      } catch (final InterruptedException e) {
-        mLogger.log(Level.SEVERE, "Error in " + mName, e);
       } finally {
         mLogger.log(Level.FINE, "Ending " + mName);
         mLatch.countDown();
@@ -161,4 +166,55 @@ public class InventoryRepositoryTest {
 
   }
 
+  @Test
+  public void testDropAndCreateSchema() throws SQLException {
+
+    final InventoryRepository repository = new InventoryRepository(
+        TestHelper.dataSource());
+
+    assertEquals(3, repository.count());
+
+    repository.dropTable();
+
+    repository.createTable(SQL_H2_INVENTORY_COLUMNS);
+
+    assertEquals(0, repository.count());
+
+    repository.close();
+  }
+
+  @Test
+  public void testImportCSV() throws SQLException, FileNotFoundException {
+    final InventoryRepository repository = new InventoryRepository(
+        TestHelper.dataSource());
+    InputStream is = null;
+    try {
+      repository.dropTable();
+
+      repository.createTable(SQL_H2_INVENTORY_COLUMNS);
+
+      assertEquals(0, repository.count());
+
+      final String resourceName = "./src/test/java/com/skillbox/boxes/jdbcinventory/testImportCSV.csv";
+      is = new FileInputStream(new File(resourceName));
+      repository.loadInventory(is);
+
+      assertEquals(3, repository.count());
+      assertEquals(12, repository.findInventoryByProductName("Red Foot Stool")
+          .getStockLevel());
+      assertEquals(3, repository
+          .findInventoryByProductName("Red Chaise Lounge").getStockLevel());
+      assertEquals(0, repository.findInventoryByProductName("Red Sofa")
+          .getStockLevel());
+
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (final IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
 }
