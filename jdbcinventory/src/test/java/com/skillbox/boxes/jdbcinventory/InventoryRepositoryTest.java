@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -164,6 +165,14 @@ public class InventoryRepositoryTest {
         + ShoppingCartClient.NUMBER_TO_PURCHASE + " should succeed ", 12,
         repository.getStockLevelById(ShoppingCartClient.PRODUCT_ID));
 
+  }
+
+  @Test
+  public void testListAll() throws SQLException {
+    final InventoryRepository repository = new InventoryRepository(
+        TestHelper.dataSource());
+    final ArrayList<Inventory> items = repository.findAll();
+    assertEquals(3, items.size());
   }
 
   @Test

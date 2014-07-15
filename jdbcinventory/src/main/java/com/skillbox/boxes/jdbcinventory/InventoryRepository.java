@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -334,5 +335,23 @@ public class InventoryRepository {
     final Inventory inv = Inventory.buildForStockLevel(quantity);
     inv.setProductName(productName);
     inv.save(mConnection, TABLE_SQL);
+  }
+
+  public ArrayList<Inventory> findAll() throws SQLException {
+
+    final ArrayList<Inventory> list = new ArrayList<Inventory>();
+
+    final PreparedStatement prepStmt = mConnection.prepareStatement("SELECT "
+        + FIELDS_SQL + " FROM " + TABLE_SQL + " WHERE 1");
+
+    try {
+      final ResultSet rs = prepStmt.executeQuery();
+      while (rs.next()) {
+        list.add(Inventory.fromResult(rs));
+      }
+    } finally {
+      prepStmt.close();
+    }
+    return list;
   }
 }
