@@ -1,6 +1,7 @@
 package com.skillbox.boxes.externalstrings;
 
 import java.io.PrintStream;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
@@ -22,7 +23,7 @@ abstract class MenuOption {
 
 public class MenuOptions {
 
-	private final SortedMap<String, MenuOption> mCommands;
+	private final LinkedHashMap<String, MenuOption> mCommands;
 	private final ResourceBundle mResourceBundle;
 	private String mTitle;
 	private Logger mLogger = Logger.getLogger(MenuOptions.class.getName());
@@ -48,7 +49,7 @@ public class MenuOptions {
 	}
 
 	public MenuOptions(final Locale locale) {
-		mCommands = new TreeMap<String, MenuOption>();
+		mCommands = new LinkedHashMap<String, MenuOption>();
 		mResourceBundle = ResourceBundle
 				.getBundle(getClass().getName(), locale);
 
@@ -85,6 +86,9 @@ public class MenuOptions {
 	}
 
 	public void runCommand(String command) {
+		
+		System.out.printf("%nProcssing Input '%s'%n", command);
+
 		for (Entry<String, MenuOption> entry : mCommands.entrySet()) {
 
 			mLogger.log(Level.FINER, "Looking at " + entry.getKey() + " for "
@@ -112,6 +116,9 @@ public class MenuOptions {
 		for (Entry<String, MenuOption> entry : mCommands.entrySet()) {
 			printMenuEntry(entry.getKey(), entry.getValue(), System.out);
 		}
+		
+		System.out.printf("%n%s%n", mTitleUnderline);
+
 	}
 
 	static public void main(String[] args) {
@@ -122,14 +129,18 @@ public class MenuOptions {
 	}
 
 	private static void runWithLocale(Locale locale) {
-		MenuOptions defaultOptions = new MenuOptions(locale);
 
-		defaultOptions.printMenu();
+		System.out
+				.printf("%n%nRunning the menu in " + locale.getDisplayLanguage() + "%n%n"); //$NON-NLS-1$
+
+		MenuOptions menu = new MenuOptions(locale);
+
+		menu.printMenu();
 
 		System.out.printf("Pretending the User Entered 'Demo'%n");
-		defaultOptions.runCommand("Demo");
-		
+		menu.runCommand("Demo");
+
 		System.out.printf("Pretending the User Entered 'LeDemo'%n");
-		defaultOptions.runCommand("LeDemo");
+		menu.runCommand("LeDemo");
 	}
 }
