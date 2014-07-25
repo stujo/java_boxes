@@ -21,7 +21,7 @@ public class TripleCrown {
    */
   private static final String JDBC_EMBEDDED_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
   private static final String JDBC_DRIVER          = JDBC_EMBEDDED_DRIVER;
-  private static String       dbURL                = "jdbc:derby:directory:races";
+  private static final String DB_URL               = "jdbc:derby:directory:races";
 
   public static void main(String[] args) {
     Connection conn = createConnection();
@@ -40,7 +40,7 @@ public class TripleCrown {
         shutdown(conn);
       }
     } else {
-      System.out.println("Unable to create connection to " + dbURL);
+      System.out.println("Unable to create connection to " + DB_URL);
     }
   }
 
@@ -50,7 +50,7 @@ public class TripleCrown {
       // This registers it with the driver manager
       Class.forName(JDBC_DRIVER).newInstance();
       // Get a connection
-      return DriverManager.getConnection(dbURL + ";create=true");
+      return DriverManager.getConnection(DB_URL + ";create=true");
     } catch (SQLException e) {
       e.printStackTrace();
     } catch (InstantiationException e) {
