@@ -39,7 +39,7 @@ public class App {
 				current[0], limit);
 	}
 
-	private static ArrayList<Integer> collectFibsUpTo(int limit) {
+	static ArrayList<Integer> collectFibsUpTo(int limit) {
 
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		result.add(0);
@@ -50,8 +50,8 @@ public class App {
 			next = result.get(result.size() - 2)
 					+ result.get(result.size() - 1);
 		}
-		System.out.printf("Did not add %d because it's greater than %d%n",
-				next, limit);
+		// System.out.printf("Did not add %d because it's greater than %d%n",
+		// next, limit);
 
 		return result;
 	}

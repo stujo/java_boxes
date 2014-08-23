@@ -7,14 +7,10 @@ package com.skillbox.boxes.generical;
 public class App {
 	public static void main(String[] args) {
 		System.out.println("Hello World!");
-
 		String tapped = tap("Hello");
-
 		System.out.println("Tap result='" + tapped + "'");
-
 		String shadow = emptyShadow("Hello");
 		System.out.println("emptyShadow result='" + shadow + "'");
-
 	}
 
 	/**
